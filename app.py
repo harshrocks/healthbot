@@ -3,7 +3,6 @@ import os
 from try2 import get_dataset_response, get_category_and_rating
 app = Flask(__name__)
 
-os.system("python -m spacy download en_core_web_sm")
 
 @app.route('/', methods=['GET', 'POST'])
 def chatbot():
