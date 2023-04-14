@@ -14,7 +14,7 @@ openai.api_key = "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"
 w2v_model = KeyedVectors.load_word2vec_format('new_another_one.bin', binary=True)
 
 # load spacy nlp model
-nlp = spacy.load('en_core_web_sm', disable=['ner', 'parser'])
+nlp = spacy.load('en_core_web_sm/', disable=['ner', 'parser'])
 # Load dataset from CSV file into pandas DataFrame
 dataset = pd.read_csv("one.csv")
 
