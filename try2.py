@@ -7,9 +7,12 @@ import re
 from spacy.lang.en.stop_words import STOP_WORDS
 from gensim.models import KeyedVectors
 from flask import Flask, request, jsonify, render_template
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
-openai.api_key = "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"
+openai.api_key = os.getenv("key")
 
 w2v_model = KeyedVectors.load_word2vec_format('new_another_one.bin', binary=True)
 
