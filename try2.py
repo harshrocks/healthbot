@@ -9,7 +9,7 @@ from gensim.models import KeyedVectors
 from flask import Flask, request, jsonify, render_template
 
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 w2v_model = KeyedVectors.load_word2vec_format('new_another_one.bin', binary=True)
 
