@@ -7,12 +7,7 @@ import re
 from spacy.lang.en.stop_words import STOP_WORDS
 from gensim.models import KeyedVectors
 from flask import Flask, request, jsonify, render_template
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
-
-openai.api_key = os.getenv("key")
 
 w2v_model = KeyedVectors.load_word2vec_format('new_another_one.bin', binary=True)
 
@@ -20,7 +15,6 @@ w2v_model = KeyedVectors.load_word2vec_format('new_another_one.bin', binary=True
 nlp = spacy.load('en_core_web_sm/', disable=['ner', 'parser'])
 # Load dataset from CSV file into pandas DataFrame
 dataset = pd.read_csv("one.csv")
-
 # Define function to get the closest matching question from dataset using spaCy's similarity score
 def preprocess_text(text):
     # lowercase text
@@ -37,6 +31,8 @@ def preprocess_text(text):
     text = " ".join([token.lemma_ for token in doc])
 
     return text
+
+
 
 def get_closest_question(question, threshold=0.7):
     max_score = -1
@@ -72,8 +68,7 @@ def get_dataset_response(question):
     if closest_question is not None:
         question = closest_question
     else:
-        response = get_openai_response(question)
-        return response, dataset['Questions'][random.randint(0, len(dataset['Questions']) - 1)]
+        return "Please ask relevant questions!", dataset['Questions'][random.randint(0, len(dataset['Questions']) - 1)]
 
     dataset_indexed = dataset.set_index('Questions')
 
@@ -100,7 +95,6 @@ def get_dataset_response(question):
         return response, closest_question
 
 # Define function to get response from OpenAI API
-def get_openai_response(question):
     # Use OpenAI API to generate response
     question = "answer this question as if a doctor is asking you \n" + question
     response = openai.Completion.create(
@@ -145,59 +139,6 @@ def get_category_and_rating(response, closest_question):
                 random_question = category_questions.sample()["Questions"].iloc[0]
                 questions.append(random_question)
     return questions
-
-
-# Get username from user
-
-# # Main chatbot loop
-# while True:
-#     # Get input from doctor
-#     # question = input(f"Doctor: ")
-#     question = "how do you feel now?"
-#
-#     if question.lower() in ["end", "stop", "quit", "exit", "bye"]:
-#         break
-#     # Check if input is in dataset or closest matching question is in dataset
-#
-#     response, closest_question = get_dataset_response(question)
-#
-#     if response is not None:
-#         # Return response from dataset
-#         print("Chatbot:", response)
-#         category = dataset.loc[dataset["Questions"] == closest_question, "Category"].iloc[0]
-#         if category not in covered_categories:
-#             covered_categories.append(category)
-#             # Store a bottom question for the category
-#             bottom_questions[category] = dataset.loc[dataset["Category"] == category].sample()["Questions"].iloc[0]
-#     else:
-#         # Return response from OpenAI API
-#         response = get_openai_response(question)
-#         print("Chatbot:", response)
-#
-# uncovered_categories = list(set(dataset["Category"]) - set(covered_categories))
-# if len(uncovered_categories) > 0:
-#     print("The following categories were not covered:")
-#     for category in uncovered_categories:
-#
-#         category_questions = dataset.loc[dataset["Category"] == category]
-#         if not category_questions.empty:
-#             random_question = category_questions.sample()["Questions"].iloc[0]
-#             print(f"\nHere's a question from the {category} category:")
-#             print(f"{random_question}")
-#         else:
-#             print(f"\nI'm sorry, I don't have any questions in the {category} category.")
-#
-# rating = input("Please rate the chatbot from 1 to 5: ")
-# print(f"Thank you for using the chatbot! You rated it {rating}/5.")
-#
-# # Store username and rating in CSV file
-# with open("ratings.csv", mode="a", newline="\n") as file:
-#     writer = csv.writer(file)
-#     writer.writerow([rating])
-#
-# # Thank the user for chatting
-# print(f"Thank you for chatting with me!")
-
 
 # run the flask app on / route
 if __name__ == "__main__":
